@@ -17,23 +17,26 @@ const app = express();
 // });
 
 //this will only handle GET call to /users/
-app.get('/user', (req, res) => {
-    res.send({firstName: "Aliya", lastName: "syed"});
+//ac, //abc
+//this will match all the routes that start with /a and end with d, and have bc in between, and can have multiple bc in between
+app.get('/user/:userId', (req, res) => {
+    console.log(req.params); //this will print the query parameters in the console
+    res.send({ firstName: "Aliya", lastName: "syed" });
 });
 
-app.post('/user', (req, res) => {
-    console.log("save data to database");
-    res.send("data saved successfully");
-});
+// app.post('/user', (req, res) => {
+//     console.log("save data to database");
+//     res.send("data saved successfully");
+// });
 
-app.delete('/user', (req, res) => {
-    res.send("data deleted successfully");
-});
+// app.delete('/user', (req, res) => {
+//     res.send("data deleted successfully");
+// });
 
-//this will match all the HTTP method API calls to /test
-app.use("/test", (req, res) => {
-    res.send("This is a test route");
-});
+// //this will match all the HTTP method API calls to /test
+// app.use("/test", (req, res) => {
+//     res.send("This is a test route");
+// });
 
 //listening to the server
 //when we call the listen method, it will start the server and listen on the specified port
