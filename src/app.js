@@ -8,16 +8,29 @@ const express = require('express');
 //creating an instance of express
 const app = express();
 
+
+//whenever a request comes to the server,the code will start executing from the top
 //request handler
-app.get('/', (req, res) => {
-    res.send('server is running!');
+//when we pass a slash anything matches slash, so it will match all the routes, so we need to be careful while using this.
+// app.get('/', (req, res) => {
+//     res.send('server is running!');
+// });
+
+//this will only handle GET call to /users/
+app.get('/user', (req, res) => {
+    res.send({firstName: "Aliya", lastName: "syed"});
 });
 
-
-app.use('/hello', (req, res) => {
-    res.send('hello hello from the server!');
+app.post('/user', (req, res) => {
+    console.log("save data to database");
+    res.send("data saved successfully");
 });
 
+app.delete('/user', (req, res) => {
+    res.send("data deleted successfully");
+});
+
+//this will match all the HTTP method API calls to /test
 app.use("/test", (req, res) => {
     res.send("This is a test route");
 });
