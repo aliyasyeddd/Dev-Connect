@@ -95,3 +95,13 @@ app.use("/user", (req, res, next) => {
     res.send("User route fifth time");
   }
 );
+wrapping any two route handlers in an array has the same effect as writing them one after another
+
+GET  request comes to /user
+first it will check whether we have match for /user in our route or not
+it checks all the app.xxx("matching route") function
+if it finds it then it executes the callback function and sends the response to the client
+if it doesn't find it hangs up
+
+the only job of express is take the request and give the response as soon as possible
+

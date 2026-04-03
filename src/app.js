@@ -4,29 +4,26 @@ const express = require('express');
 const app = express();
 
 
-app.use("/user", (req, res, next) => {
-  console.log("User route accessed");
-  next(); 
-  //res.send("User route");
-},
-  (req, res, next) => {
-    //route handler
-    console.log("User route accessed again");
-    next(); 
-    //res.send("User route again");
-  }, (req, res, next) => {
-    console.log("User route accessed third time");
-    next();
-    //res.send("User route third time");
-  },(req, res, next) => {
-    console.log("User route accessed fourth time");
-    next();
-    //res.send("User route fourth time");
-  },  (req, res) => {
-    console.log("User route accessed fifth time");
-    res.send("User route fifth time");
-  }
-);
+//handle auth Middleware for all request's to /admin GET , POST , PUT , DELETE
+const { adminAuth, userAuth } = require("./middlewares/auth");
+
+app.use("/admin", adminAuth);
+
+app.post("/user/login", (req, res) => {
+  res.send("User logged in successfully!");
+});
+
+app.get("/user", userAuth, (req, res) => {
+  res.send("User Data Sent");
+});
+
+app.get("/admin/getAllData", (req, res) => {
+  res.send("All Data Sent");
+});
+
+app.get("/admin/deleteUser", (req, res) => {
+  res.send("Deleted a user");
+});
 
 app.listen(7777, () => {
   console.log('Server is running on port 7777');
