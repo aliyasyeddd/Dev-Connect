@@ -105,3 +105,20 @@ if it doesn't find it hangs up
 
 the only job of express is take the request and give the response as soon as possible
 
+ Error handling middleware
+app.use((err, req, res, next) => {
+  if(err) {
+    //log your error message
+    res.status(500).send("something went wrong");
+  }
+});
+
+-> route handlers functions
+if you are passing two parameters first will be request and second will be response
+if you are passing three parameters first request , second response , third next
+if you are passing four parameters first will be error, second request, third response and fourth will be next
+
+
+-> the good way is to use try catch in error handling
+-> order of the functions is important
+
