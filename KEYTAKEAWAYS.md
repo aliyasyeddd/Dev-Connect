@@ -117,8 +117,60 @@ app.use((err, req, res, next) => {
 if you are passing two parameters first will be request and second will be response
 if you are passing three parameters first request , second response , third next
 if you are passing four parameters first will be error, second request, third response and fourth will be next
+app.get("/getUserData", (req, res) => {
+  try {
+  throw new Error("Error while fetching user data");
+  res.send("User Data Sent");
+  } catch (err) {   
+    res.status(500).send("Some Error contact support team");
+  }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  if(err) {
+    //log your error message
+    res.status(500).send("something went wrong");
+  }
+});
+
 
 
 -> the good way is to use try catch in error handling
 -> order of the functions is important
+-> always write error handling towards the end
 
+when this code runs the server started accepting the request on port 7777 and 
+when we hit the endpoint it will execute the code inside the callback function and send the response to the client.
+app.listen(7777, () => {
+  console.log('Server is running on port 7777');
+});
+
+
+const express = require('express');
+-> connect to the database and then listen to the server / api calls
+const connectDB = require('./config/database');
+const app = express();
+
+-> returns a promise
+connectDB().then(() => {
+  console.log("Database Connection established.... successfully");
+  -> when this code runs the server started accepting the request
+  app.listen(7777, () => {
+    console.log('Server is running on port 7777');
+  });
+}).catch((err) => {
+  console.log("database connection failed!!!!");
+});
+
+
+whenever you are doing any database operation it is always better to use try catch block to handle the error and 
+avoid crashing of the server
+
+  try {
+    ->saving the user to the database
+    await user.save();
+    res.send("User added successfully");
+  } catch (err) {
+    res.status(400).send("Error saving the user : " + err.message);
+  }
