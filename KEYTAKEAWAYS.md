@@ -59,7 +59,7 @@ app.use("/user", (req, res) => {
 we can add multiple route handlers for the same route
 app.use("/user", (req, res, next) => {
   console.log("User route accessed");
-  next(); // Call the next middleware function
+  next();   Call the next middleware function
   res.send("User route");
 },
   (req, res) => {
@@ -194,3 +194,45 @@ app.post("/signup", async (req, res) => {
   }
 
 });
+
+
+
+
+
+ Get user by email 
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.emailId;
+  try {
+     -> findOne method will return the first user that matches the emailId and if there is no user with the given emailId it will return null
+    const user = await User.findOne({ emailId: userEmail });
+    if (!user) {
+      res.status(404).send("User not found");
+    } else {
+      res.send(user);
+    }
+      const users = await User.find({ emailId: userEmail });
+      if (users.length === 0) {
+        res.status(404).send("User not found");
+      } else {
+        res.send(users);
+      }
+  } catch (err) {
+    res.status(400).send("something went wrong");
+  }
+
+})
+
+ Feed API - GET /feed - get all the users from the database and send it to the client
+app.get("/feed", async (req, res) => {
+  try {
+     -> passing empty object to find method will return all the users in the database
+    const users = await User.find({});
+    res.send(users);
+  } catch (err) {
+    res.status(400).send("Something went wrong ");
+  }
+});
+
+
+
+

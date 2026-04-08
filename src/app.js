@@ -5,13 +5,12 @@ const connectDB = require('./config/database');
 const app = express();
 const User = require('./models/user');
 
-//if we don't use this middleware then we will not be able to access the data sent in the request body and it will be undefined.
 app.use(express.json()); //middleware to parse the incoming request body as JSON
 
 app.post("/signup", async (req, res) => {
   //creating new user with the above data - creating a  new instance of a user model
-  const user = new User(req.body); //this will create a new user object with the data sent in the request body and 
-  // it will be in the format of the user schema defined in the user model.
+  const user = new User(req.body);
+
 
 
   try {
@@ -23,6 +22,41 @@ app.post("/signup", async (req, res) => {
   }
 
 });
+
+//Get user by email 
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.emailId;
+  try {
+    //findOne method will return the first user that matches the emailId and if there is no user with the given emailId it will return null
+    const user = await User.findOne({ emailId: userEmail });
+    if (!user) {
+      res.status(404).send("User not found");
+    } else {
+      res.send(user);
+    }
+    // const users = await User.find({ emailId: userEmail });
+    // if (users.length === 0) {
+    //   res.status(404).send("User not found");
+    // } else {
+    //   res.send(users);
+    // }
+  } catch (err) {
+    res.status(400).send("something went wrong");
+  }
+
+})
+
+//Feed API - GET /feed - get all the users from the database and send it to the client
+app.get("/feed", async (req, res) => {
+  try {
+    //passing empty object to find method will return all the users in the database
+    const users = await User.find({});
+    res.send(users);
+  } catch (err) {
+    res.status(400).send("Something went wrong ");
+  }
+});
+
 
 //returns a promise
 connectDB().then(() => {
