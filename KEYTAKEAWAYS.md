@@ -255,4 +255,58 @@ app.patch("/user", async (req, res) => {
   }
 });
 
+required means that this field is mandatory and if we try to save a user without this field then it will throw an error. in schema model
+unique identifier for each user - emailId should be unique for each user and it should be required field 
+->whenever we create a new user and if we don't provide the about field then
+->it will take the default value which is "This is a default about of the user!".
+    about: {
+      type: String,
+      default: "This is a default about of the user!",
+    },
 
+-> to keep ur email id consistent we can convert it to lowercase before saving it to the database using lowercase option in the schema.
+    emailId: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true ->to remove any whitespace from the email id before saving it to the database.
+    },
+
+
+ gender: {
+        type: String,
+        -> to validate the gender data we can use the validate option in the schema and we can check if the value is either male, female or others and if it is not then we can throw an error.  
+        -> validate method will oly be called when new document is being created
+         validate(value) {
+        if (!["male", "female", "others"].includes(value)) {
+          throw new Error("Gender data is not valid");
+        }
+      },
+    },
+
+
+
+->  Update data of the user
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  -> runValidators option will run the validators defined in the schema
+  ->   before updating the user data and if there is any validation error then it will throw an error and 
+  ->  the user data will not be updated in the database.
+  try {
+    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+      runValidators: true,
+    });
+    res.send("User updated successfully");
+  } catch (err) {
+    res.status(400).send("UPDATE FAILED:" + err.message);
+  }
+});
+
+ -> timestamps option will add createdAt and updatedAt fields to the user document and 
+ -> it will automatically update the updatedAt field whenever we update the user document.
+    {
+        timestamps: true,
+    }

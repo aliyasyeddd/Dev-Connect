@@ -32,6 +32,11 @@ Create a delete user API
 Difference between PATCH and PUT
 API - Update a user
 API - Update the user with email ID
+add required, unique, lowercase, min, minLength, trim
+ Add default
+ Create a custom validate function for gender
+ Improve the DB schema PUT all appropiate validations on each field in Schema
+ Add timestamps to the userSchema
 
 
 
@@ -57,3 +62,5 @@ JS object vs JSON (difference)
 Difference between PATCH and PUT
 Explore the Mongoose Documention for Model methods
 What are options in a Model.findOneAndUpdate method, explore more about it
+ Explore schematype options from the documention
+ 
