@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
     firstName: {
@@ -16,11 +17,23 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
         lowercase: true,
-        trim: true //to remove any whitespace from the email id before saving it to the database.
+        trim: true, //to remove any whitespace from the email id before saving it to the database.
+        //to validate the email id we can use the validate option in the schema and we can use the
+        //  validator library to validate the email id and if the email id is not valid then we can throw an error.
+        validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email address: " + value);
+        }
+      },
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a Strong Password: " + value);
+        }
+      },
     },
     age: {
         type: Number,
@@ -37,9 +50,14 @@ const userSchema = new mongoose.Schema({
             }
         },
     },
-    photoUrl: {
+    photoURL: {
         type: String,
         default: "https://geographyandyou.com/images/user-profile.png",
+        validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid Photo URL: " + value);
+        }
+      },
     },
     //whenever we create a new user and if we don't provide the about field then
     //  it will take the default value which is "This is a default about of the user!".

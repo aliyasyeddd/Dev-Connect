@@ -75,7 +75,7 @@ app.patch("/user/:userId", async (req, res) => {
   const data = req.body;
   //runValidators option will run the validators defined in the schema 
   try {
-    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age", "skills"];
+    const ALLOWED_UPDATES = ["photoURL", "about", "gender", "age", "skills", "password"];
     const isUpdateAllowed = Object.keys(data).every((k) =>
       ALLOWED_UPDATES.includes(k)
     );
