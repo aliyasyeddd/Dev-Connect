@@ -41,6 +41,7 @@ Add timestamps to the userSchema
  DATA Sanitizing - Add API validation for each field
 Install validator
 Explore validator library function and Use validator function for password, email, photoURL
+NEVER TRUST req.body
 
 
 
