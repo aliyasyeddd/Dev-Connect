@@ -236,3 +236,23 @@ app.get("/feed", async (req, res) => {
 
 
 
+// Update data of the user
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+      -> options object is used to specify the options for the update operation. 
+      -> returnDocument: "after" option is used to return the updated document after the update operation is performed.
+      -> If we don't specify this option, it will return the original document before the update operation is performed.
+      -> findByIdAndUpdate method will find the user by the given userId and
+      -> update the user data with the given data and return the updated user data
+    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+    });
+    res.send("User updated successfully");
+  } catch (err) {
+    res.status(400).send("Something went wrong ");
+  }
+});
+
+

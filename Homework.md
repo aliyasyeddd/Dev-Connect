@@ -28,6 +28,12 @@ User.findOne with duplicate email ids, which object returned
 API- Get user by email
 API - Feed API - GET /feed - get all the users from the database
 API - Get user by ID
+Create a delete user API
+Difference between PATCH and PUT
+API - Update a user
+API - Update the user with email ID
+
+
 
 //questions 
 What are dependencies
@@ -48,3 +54,6 @@ next()
 next function and errors along with res.send()
 app.use("/route", rH, [rH2, rH3], rH4, rh5);
 JS object vs JSON (difference)
+Difference between PATCH and PUT
+Explore the Mongoose Documention for Model methods
+What are options in a Model.findOneAndUpdate method, explore more about it

@@ -11,8 +11,6 @@ app.post("/signup", async (req, res) => {
   //creating new user with the above data - creating a  new instance of a user model
   const user = new User(req.body);
 
-
-
   try {
     //saving the user to the database
     await user.save();
@@ -57,6 +55,33 @@ app.get("/feed", async (req, res) => {
   }
 });
 
+// Delete a user from the database
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    const user = await User.findByIdAndDelete({ _id: userId });
+    //const user = await User.findByIdAndDelete(userId);
+
+    res.send("User deleted successfully");
+  } catch (err) {
+    res.status(400).send("Something went wrong ");
+  }
+});
+
+
+// Update data of the user
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+    });
+    res.send("User updated successfully");
+  } catch (err) {
+    res.status(400).send("Something went wrong ");
+  }
+});
 
 //returns a promise
 connectDB().then(() => {
