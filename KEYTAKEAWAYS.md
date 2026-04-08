@@ -174,3 +174,23 @@ avoid crashing of the server
   } catch (err) {
     res.status(400).send("Error saving the user : " + err.message);
   }
+
+works for all the routes
+app.use(express.json()); -> middleware to parse the incoming request body as JSON
+if we don't use this middleware then we will not be able to access the data sent in the request body and it will be undefined.
+
+app.post("/signup", async (req, res) => {
+  creating new user with the above data - creating a  new instance of a user model
+  const user = new User(req.body); -> this will create a new user object with the data sent in the request body and 
+   it will be in the format of the user schema defined in the user model.
+
+
+  try {
+    saving the user to the database
+    await user.save();
+    res.send("User added successfully");
+  } catch (err) {
+    res.status(400).send("Error saving the user : " + err.message);
+  }
+
+});

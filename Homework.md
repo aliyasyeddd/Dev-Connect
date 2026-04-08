@@ -22,6 +22,8 @@ Create a userSchema & user Model
 Create POST /signup API to add data to database
 Push some documents using API calls from postman
 Error Handling using try , catch
+Add the express.json middleware to your app
+Make your signup API dynamic to receive data from the end user
 
 //questions 
 What are dependencies
@@ -41,3 +43,4 @@ Multiple Route Handlers - Play with the code
 next()
 next function and errors along with res.send()
 app.use("/route", rH, [rH2, rH3], rH4, rh5);
+JS object vs JSON (difference)

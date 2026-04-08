@@ -5,17 +5,14 @@ const connectDB = require('./config/database');
 const app = express();
 const User = require('./models/user');
 
+//if we don't use this middleware then we will not be able to access the data sent in the request body and it will be undefined.
+app.use(express.json()); //middleware to parse the incoming request body as JSON
+
 app.post("/signup", async (req, res) => {
   //creating new user with the above data - creating a  new instance of a user model
-  const user = new User({
-    firstName: "faiza",
-    lastName: "asifa",
-    emailId: "faizavibe@gmail.com",
-    password: "faiza@45#",
-  });
+  const user = new User(req.body); //this will create a new user object with the data sent in the request body and 
+  // it will be in the format of the user schema defined in the user model.
 
-  //whenever you are doing any database operation it is always better to use try catch block to handle the error and 
-  // avoid crashing of the server
 
   try {
     //saving the user to the database
