@@ -8,6 +8,7 @@ const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 
 app.use(express.json()); //middleware to parse the incoming request body as JSON
 app.use(cookieParser()); //middleware to parse the cookies and attach it to the request object
@@ -43,9 +44,7 @@ app.post("/signup", async (req, res) => {
 
 });
 
-//login API - POST /login - check if the user with the given emailId exists in the database and 
-// if it exists then compare the password with the hashed password stored in the database and
-//  if it matches then send a success message to the client otherwise send an error message
+//login API - POST /login
 app.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
@@ -61,11 +60,14 @@ app.post("/login", async (req, res) => {
     if (isPasswordValid) {
       // Create a JWT Token
       //hiding the user id (data) and also adding a secret key which only the server knows 
-      const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$790");
+      const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$790", { expiresIn: "1d" });
 
       // Add the token to cookie and send the response back to the user
       //sending response back express gives a good way to attach cookie to the response object and send it back to the client
-      res.cookie("token", token)
+      //logic to expire the cookie after 8 hours - we are setting the expiry time of the cookie to 8 hours from the current time
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
       res.send("Login successful");
     } else {
       //never specify whether the emailId or password is incorrect because it can give a hint to the attacker about 
@@ -78,116 +80,22 @@ app.post("/login", async (req, res) => {
   }
 })
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    const { token } = cookies;
-
-    //token is the string which we have sent to the client in the cookie and 
-    //whenever the client sends a request to the server it will automatically attach the cookie to the request and
-    //we can access it using req.cookies and then we can extract the token from the cookies and
-    //verify it using the secret key which we have used to sign the token and
-    //if the token is valid then we can get the user id from the decoded message and 
-    //then we can find the user in the database using the user id and send the user data back to the client
-    if (!token) {
-      throw new Error("Invalid Token");
-    }
-
-
-    const decodedMessage = await jwt.verify(token, "DEV@Tinder$790");
-
-    
-    //whenever you need to read the cookie - you need to use a middleware called cookie-parser 
-    // which will parse the cookies and attach it to the request object and then you can access it using req.cookies
-
-    //decodedMessage will contain the data which we have hidden in the token and 
-    // also it will contain some other information like iat (issued at) which is the time
-    //  when the token was issued and exp (expiration time) which is the time when the token will expire
-    const { _id } = decodedMessage;
-
-    const user = await User.findById(_id);
-    if (!user) {
-      throw new Error("User does not exist");
-    }
+    const user = req.user;
     res.send(user);
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
 })
 
-//Get user by email 
-app.get("/user", async (req, res) => {
-  const userEmail = req.body.emailId;
-  try {
-    //findOne method will return the first user that matches the emailId and if there is no user with the given emailId it will return null
-    const user = await User.findOne({ emailId: userEmail });
-    if (!user) {
-      res.status(404).send("User not found");
-    } else {
-      res.send(user);
-    }
-    // const users = await User.find({ emailId: userEmail });
-    // if (users.length === 0) {
-    //   res.status(404).send("User not found");
-    // } else {
-    //   res.send(users);
-    // }
-  } catch (err) {
-    res.status(400).send("something went wrong");
-  }
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  const user = req.user;
+  // Sending a connection request
+  console.log("Sending a connection request");
 
+  res.send(user.firstName + " sent the connect request!");
 })
-
-//Feed API - GET /feed - get all the users from the database and send it to the client
-app.get("/feed", async (req, res) => {
-  try {
-    //passing empty object to find method will return all the users in the database
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(400).send("Something went wrong ");
-  }
-});
-
-// Delete a user from the database
-app.delete("/user", async (req, res) => {
-  const userId = req.body.userId;
-  try {
-    const user = await User.findByIdAndDelete({ _id: userId });
-    //const user = await User.findByIdAndDelete(userId);
-
-    res.send("User deleted successfully");
-  } catch (err) {
-    res.status(400).send("Something went wrong ");
-  }
-});
-
-
-// Update data of the user
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
-  //runValidators option will run the validators defined in the schema 
-  try {
-    const ALLOWED_UPDATES = ["photoURL", "about", "gender", "age", "skills", "password"];
-    const isUpdateAllowed = Object.keys(data).every((k) =>
-      ALLOWED_UPDATES.includes(k)
-    );
-    if (!isUpdateAllowed) {
-      throw new Error("Update not allowed");
-    }
-    if (data?.skills.length > 10) {
-      throw new Error("Skills cannot be more than 10");
-    }
-    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    res.send("User updated successfully");
-  } catch (err) {
-    res.status(400).send("UPDATE FAILED:" + err.message);
-  }
-});
 
 //returns a promise
 connectDB().then(() => {

@@ -419,4 +419,36 @@ app.get("/profile", async (req, res) => {
 
   -> whenever you need to read the cookie - you need to use a middleware called cookie-parser 
     ->  which will parse the cookies and attach it to the request object and then you can access it using req.cookies
-    
+ /basically checking if the token is valid or not and if the user exists or not
+const userAuth = async (req, res, next) => {
+  try {
+    //read the token from the request cookies
+    const { token } = req.cookies;
+    if (!token) {
+      throw new Error("Token is not valid!!!!!!!!!");
+    }
+
+    //verify the token 
+    const decodedObj = await jwt.verify(token, "DEV@Tinder$790");
+    //validate the token
+
+    const { _id } = decodedObj;
+
+    //find the user
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    //attached user to the request object so that we can access it in the next middleware or route handler
+    req.user = user;
+    next();
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+};
+
+
+//logic to expire the cookie after 8 hours - we are setting the expiry time of the cookie to 8 hours from the current time
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
