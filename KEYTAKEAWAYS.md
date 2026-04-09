@@ -478,3 +478,8 @@ hash method will return a promise and it takes two arguments first is the passwo
 that we want to hash and second is the number of rounds for hashing which is 10 in this case
 the higher the number of rounds the more secure the password will be but it will also take more time to hash the password
 the hash method will return the hashed password which we can store in the database instead of the plain text password
+
+along with the decoded object we are also passing the secret key which is used to sign the token
+generating the token in the getJWT method of the user model
+const decodedObj = await jwt.verify(token, "DEV@Tinder$790");
+
