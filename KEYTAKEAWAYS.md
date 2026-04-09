@@ -333,3 +333,10 @@ const passwordHash = await bcrypt.hash(password, 10);
 console.log(passwordHash)
 
 
+
+-> never specify whether the emailId or password is incorrect because it can give a hint to the attacker about 
+      which one is correct and which one is not
+ throw new Error("Invalid credentials");
+
+
+

@@ -24,7 +24,6 @@ app.post("/signup", async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
     //console.log(passwordHash)
 
-
     //creating new user with the above data - creating a  new instance of a user model
     const user = new User({
       firstName,
@@ -32,8 +31,6 @@ app.post("/signup", async (req, res) => {
       emailId,
       password: passwordHash,
     });
-
-
     //saving the user to the database
     await user.save();
     res.send("User added successfully");
@@ -42,6 +39,34 @@ app.post("/signup", async (req, res) => {
   }
 
 });
+
+//login API - POST /login - check if the user with the given emailId exists in the database and 
+// if it exists then compare the password with the hashed password stored in the database and
+//  if it matches then send a success message to the client otherwise send an error message
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid credentials");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isPasswordValid) {
+      res.send("Login successful");
+    } else {
+      //never specify whether the emailId or password is incorrect because it can give a hint to the attacker about 
+      // which one is correct and which one is not
+      throw new Error("Invalid credentials");
+    }
+
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
+})
 
 //Get user by email 
 app.get("/user", async (req, res) => {
