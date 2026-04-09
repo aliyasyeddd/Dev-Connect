@@ -63,7 +63,7 @@ app.use("/user", (req, res, next) => {
   res.send("User route");
 },
   (req, res) => {
-    //route handler
+    -> route handler
     console.log("User route accessed again");
     res.send("User route again");
   }
@@ -339,4 +339,84 @@ console.log(passwordHash)
  throw new Error("Invalid credentials");
 
 
+-> sending response back express gives a good way to attach cookie to the response object and send it back to the client
 
+
+app.use(cookieParser()); //middleware to parse the cookies and attach it to the request object
+
+
+
+
+-> login API - POST /login - check if the user with the given emailId exists in the database and 
+-> if it exists then compare the password with the hashed password stored in the database and
+-> if it matches then send a success message to the client otherwise send an error message
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid credentials");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isPasswordValid) {
+      ->  Create a JWT Token
+      -> hiding the user id (data) and also adding a secret key which only the server knows 
+      const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$790");
+      console.log(token)
+
+      ->  Add the token to cookie and send the response back to the user
+      -> sending response back express gives a good way to attach cookie to the response object and send it back to the client
+      res.cookie("token", token)
+      res.send("Login successful");
+    } else {
+      -> never specify whether the emailId or password is incorrect because it can give a hint to the attacker about 
+      ->  which one is correct and which one is not
+      throw new Error("Invalid credentials");
+    }
+
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
+})
+
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    const { token } = cookies;
+
+    -> token is the string which we have sent to the client in the cookie and 
+    -> whenever the client sends a request to the server it will automatically attach the cookie to the request and
+    -> we can access it using req.cookies and then we can extract the token from the cookies and
+    -> verify it using the secret key which we have used to sign the token and
+    -> if the token is valid then we can get the user id from the decoded message and 
+    -> then we can find the user in the database using the user id and send the user data back to the client
+    if (!token) {
+      throw new Error("Invalid Token");
+    }
+
+    const decodedMessage = await jwt.verify(token, "DEV@Tinder$790");
+    console.log(decodedMessage);
+
+    -> decodedMessage will contain the data which we have hidden in the token and 
+    ->  also it will contain some other information like iat (issued at) which is the time
+    ->   when the token was issued and exp (expiration time) which is the time when the token will expire
+    const { _id } = decodedMessage;
+
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("User does not exist");
+    }
+    res.send(user);
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
+})
+
+
+  -> whenever you need to read the cookie - you need to use a middleware called cookie-parser 
+    ->  which will parse the cookies and attach it to the request object and then you can access it using req.cookies
+    
