@@ -4,19 +4,41 @@ const express = require('express');
 const connectDB = require('./config/database');
 const app = express();
 const User = require('./models/user');
+const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(express.json()); //middleware to parse the incoming request body as JSON
 
 app.post("/signup", async (req, res) => {
-  //creating new user with the above data - creating a  new instance of a user model
-  const user = new User(req.body);
-
   try {
+    // Validation of data
+    validateSignUpData(req);
+
+    const { firstName, lastName, emailId, password } = req.body;
+
+    // Encrypt the password
+    //hash method will return a promise and it takes two arguments first is the password
+    //  that we want to hash and second is the number of rounds for hashing which is 10 in this case
+    // the higher the number of rounds the more secure the password will be but it will also take more time to hash the password
+    // the hash method will return the hashed password which we can store in the database instead of the plain text password
+    const passwordHash = await bcrypt.hash(password, 10);
+    //console.log(passwordHash)
+
+
+    //creating new user with the above data - creating a  new instance of a user model
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
+
+
     //saving the user to the database
     await user.save();
     res.send("User added successfully");
   } catch (err) {
-    res.status(400).send("Error saving the user : " + err.message);
+    res.status(400).send("ERROR: " + err.message);
   }
 
 });

@@ -320,3 +320,16 @@ app.patch("/user", async (req, res) => {
       },
 
 
+
+
+->Encrypt the password
+->hash method will return a promise and it takes two arguments first is the password
+->that we want to hash and second is the number of rounds for hashing which is 10 in this case
+->the higher the number of rounds the more secure the password will be but it will also take more time to hash the password
+->the hash method will return the hashed password which we can store in the database instead of the plain text password
+-> once you have encrypted the password you cannot get the plain text back
+     from the hashed password so even if someone gets access to the database they cannot see the plain text password of the users
+const passwordHash = await bcrypt.hash(password, 10);
+console.log(passwordHash)
+
+
