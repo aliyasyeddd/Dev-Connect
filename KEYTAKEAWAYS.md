@@ -422,24 +422,24 @@ app.get("/profile", async (req, res) => {
  /basically checking if the token is valid or not and if the user exists or not
 const userAuth = async (req, res, next) => {
   try {
-    //read the token from the request cookies
+   -> read the token from the request cookies
     const { token } = req.cookies;
     if (!token) {
       throw new Error("Token is not valid!!!!!!!!!");
     }
 
-    //verify the token 
+   -> verify the token 
     const decodedObj = await jwt.verify(token, "DEV@Tinder$790");
-    //validate the token
+   -> validate the token
 
     const { _id } = decodedObj;
 
-    //find the user
+   -> find the user
     const user = await User.findById(_id);
     if (!user) {
       throw new Error("User not found");
     }
-    //attached user to the request object so that we can access it in the next middleware or route handler
+   -> attached user to the request object so that we can access it in the next middleware or route handler
     req.user = user;
     next();
   } catch (err) {
@@ -448,7 +448,33 @@ const userAuth = async (req, res, next) => {
 };
 
 
-//logic to expire the cookie after 8 hours - we are setting the expiry time of the cookie to 8 hours from the current time
+logic to expire the cookie after 8 hours - we are setting the expiry time of the cookie to 8 hours from the current time
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 3600000),
       });
+
+-> expire the token after 1 day
+
+-> don't use arrow function here because we need to use the this keyword to access the user document
+-> and arrow function doesn't have its own this keyword.
+-> if user is aliya - it will get jwt token for aliya and if user is john - it will get jwt token for john 
+->  because we are using the this keyword to access the user document and we are generating the token based on the user document.
+userSchema.methods.getJWT = async function () {
+    const user = this;
+
+    const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$790", {
+        expiresIn: "7d",
+    });
+
+    return token;
+};
+
+const token = await user.getJWT(); -> offloaded the logic of generating JWT token to the user model
+->  because it is related to the user and it is better to keep it in the user model rather than in the route handler
+
+
+Encrypt the password
+hash method will return a promise and it takes two arguments first is the password
+that we want to hash and second is the number of rounds for hashing which is 10 in this case
+the higher the number of rounds the more secure the password will be but it will also take more time to hash the password
+the hash method will return the hashed password which we can store in the database instead of the plain text password
