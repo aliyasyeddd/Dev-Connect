@@ -503,3 +503,12 @@ HEADER . PAYLOAD . SIGNATURE
 Takes payload:{ "_id": "???" }
 Adds timestamps:
 Signs using secret → creates token
+
+generates a JWT token for that user
+const token = await user.getJWT(); 
+
+res.cookie("token", token)
+You are sending the token to the browser as a cookie
+"token" → cookie name
+token → cookie value
+
