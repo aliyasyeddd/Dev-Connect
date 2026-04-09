@@ -483,3 +483,23 @@ along with the decoded object we are also passing the secret key which is used t
 generating the token in the getJWT method of the user model
 const decodedObj = await jwt.verify(token, "DEV@Tinder$790");
 
+
+  -> Here you are storing: user’s MongoDB _id in the token’s payload, which is a common practice
+  -> for identifying the user in subsequent requests.
+  -> The token is signed using a secret key ("DEV@Tinder$790") to ensure its integrity and authenticity.
+  -> The token is set to expire in 7 days, which means the user will need to log in again after that period to get a new token.
+  const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$790", {
+        expiresIn: "7d",
+    });
+
+
+Secret Key
+This is used to sign the token
+Think of it like a password for your server
+Only your backend should know this
+
+After signing, you get:
+HEADER . PAYLOAD . SIGNATURE
+Takes payload:{ "_id": "???" }
+Adds timestamps:
+Signs using secret → creates token

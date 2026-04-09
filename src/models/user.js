@@ -84,7 +84,11 @@ const userSchema = new mongoose.Schema({
 // because we are using the this keyword to access the user document and we are generating the token based on the user document.
 userSchema.methods.getJWT = async function () {
     const user = this;
-
+    
+     // Here you are storing: user’s MongoDB _id in the token’s payload, which is a common practice
+     //  for identifying the user in subsequent requests.
+     // The token is signed using a secret key ("DEV@Tinder$790") to ensure its integrity and authenticity.
+     // The token is set to expire in 7 days, which means the user will need to log in again after that period to get a new token.
     const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$790", {
         expiresIn: "7d",
     });
