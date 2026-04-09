@@ -4,7 +4,7 @@ const User = require("../models/user");
 //basically checking if the token is valid or not and if the user exists or not
 const userAuth = async (req, res, next) => {
   try {
-    //read the token from the request cookies
+    //read the token from the request cookies and if the token is not present then throw an error
     const { token } = req.cookies;
     if (!token) {
       throw new Error("Token is not valid!!!!!!!!!");
