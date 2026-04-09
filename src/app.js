@@ -21,7 +21,7 @@ app.post("/signup", async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    //creating new user with the above data - creating a  new instance of a user model
+    // creating a  new instance of a user model
     const user = new User({
       firstName,
       lastName,
