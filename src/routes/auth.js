@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 
 const authRouter = express.Router();
 
-
+//signup - API
 authRouter.post("/signup", async (req, res) => {
   try {
     // Validation of data
@@ -59,6 +59,16 @@ authRouter.post("/login", async (req, res) => {
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
+})
+
+
+
+//Logout - API - telling the browser: “This cookie is already expired → remove it” 
+authRouter.post("/logout", (req, res) => {
+  res.cookie("token", null , {
+    expires: new Date(Date.now()),
+  });
+  res.send("Logout successful");
 })
 
 module.exports = authRouter;

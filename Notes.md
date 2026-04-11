@@ -519,3 +519,32 @@ app.use() it is same as authRouter.use()
 -> whenever request coming from slash go to authRouter and check if there is any matching route in authRouter
 app.use("/", authRouter)
 
+->login API - POST /login
+->the user logs in using email and password, if the credentials are valid, a JWT token is generated and sent back to the client in a cookie.
+->The token expires in 8 hours. If the credentials are invalid, an error message is sent back to the client.
+
+
+
+->Logout - API - telling the browser: “This cookie is already expired → remove it” 
+->remove the token cookie from the browser by setting it to null and expiring it immediately
+authRouter.post("/logout", (req, res) => {
+  res.cookie("token", null , {
+    expires: new Date(Date.now()),
+  });
+  res.send();
+})
+
+-> Edit profile data - check if every field which is coming from the client is present in the allowedEditFields array or not 
+   const isEditAllowed = Object.keys(req.body).every((field) => allowedEditFields.includes(field))
+
+
+-> req.user is the logged in user whose profile we want to edit and we can access it in the route handler because 
+-> we have used the userAuth middleware which is setting the req.user to the logged in user.
+    const loggedInUser = req.user
+
+
+
+->req.body - user is sending only those fields which he wants to update and we are updating only those fields in the user document
+->which are coming from the client. then we are checking if the field which is coming from the client is present in the allowedEditFields array or not and if it is not then we are throwing an error.
+    Object.keys(req.body).forEach((key) => loggedInUser[key] = req.body[key])
+
