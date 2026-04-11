@@ -512,3 +512,10 @@ You are sending the token to the browser as a cookie
 "token" → cookie name
 token → cookie value
 
+
+| * DIVING INTO API'S AND EXPRESS ROUTER * |
+app.use() it is same as authRouter.use() 
+
+-> whenever request coming from slash go to authRouter and check if there is any matching route in authRouter
+app.use("/", authRouter)
+
