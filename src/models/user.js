@@ -3,6 +3,8 @@ const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
+
+//The identity of a user
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
@@ -43,14 +45,22 @@ const userSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        //to validate the gender data we can use the validate option in the schema and we can check if the value is either male, female or others and
-        //  if it is not then we can throw an error.  
-        //validate method will oly be called when new document is being created
-        validate(value) {
-            if (!["male", "female", "others"].includes(value)) {
-                throw new Error("Gender data is not valid");
-            }
+        // Enum validation ensures that only predefined values are allowed
+        enum: {
+            // Allowed values for the gender field
+            values: ["male", "female", "other"],
+            // Custom error message if the value is not in the allowed list
+            // {VALUE} will be replaced with the invalid value entered
+            message: `{VALUE} is not a valid gender type`,
         },
+        // Custom validator (alternative to enum)
+        // This manually checks if the provided value exists in the allowed list
+        // If not, it throws an error
+        // validate(value) {
+        //   if (!["male", "female", "others"].includes(value)) {
+        //     throw new Error("Gender data is not valid");
+        //   }
+        // },
     },
     photoURL: {
         type: String,
@@ -81,7 +91,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.getJWT = async function () {
     const user = this;
-    
+
     const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$790", {
         expiresIn: "7d",
     });
