@@ -105,5 +105,5 @@ JS object vs JSON (difference)
 Difference between PATCH and PUT
 Explore the Mongoose Documentation for Model methods
 What are options in a Model.findOneAndUpdate method, explore more about it
- Explore schema type options from the documentation
+Explore schema type options from the documentation
  

@@ -568,3 +568,31 @@ either it can can interested or rejected
 
 
 -> whenever you write pre opr schema write with function declaration don't use arrow function
+
+
+
+-> if you create index in your database on the first name db will optimize like that your query will become fast
+-> suppose if we don't put index to email to login api will become slow
+-> if you are making any field unique i.e., if you are saying email-id is unique
+-> mongodb automatically creates index for that-
+-> Unique index. If you specify `unique: true`
+-> specifying `index: true` is optional if you do `unique: true`
+
+
+
+-> ConnectionRequest.find({fromUserId: 273478465864786587, toUserId: 273478465864786587})
+-> connection request will be fast
+connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
+ -> if you put compound index on the both items this query will be fast
+    const existingConnectionRequest = await ConnectionRequest.findOne({
+      $or: [
+        { fromUserId, toUserId },
+        { fromUserId: toUserId, toUserId: fromUserId },
+      ],
+    });
+
+
+
+-> suppose you want to find user by first name + last name i will create compound index on both fields
+-> { fromUserId: 1, toUserId: 1 } queries will be fast
+-> when you create a lot of indexes it will be tough for db to handle if there are 1lakh + users it makes sense to add these compound index

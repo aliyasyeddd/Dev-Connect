@@ -19,11 +19,11 @@ const userSchema = new mongoose.Schema({
     emailId: {
         type: String,
         required: true,
-        unique: true,
+        unique: true, // Unique index. If you specify `unique: true`
         lowercase: true,
         trim: true, //to remove any whitespace from the email id before saving it to the database.
-        //to validate the email id we can use the validate option in the schema and we can use the
-        //  validator library to validate the email id and if the email id is not valid then we can throw an error.
+        // to validate the email id we can use the validate option in the schema and we can use the
+        // validator library to validate the email id and if the email id is not valid then we can throw an error.
         validate(value) {
             if (!validator.isEmail(value)) {
                 throw new Error("Invalid email address: " + value);

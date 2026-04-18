@@ -31,6 +31,7 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
     //if there is an existing connection request
     // Check if a connection request already exists between the two users
     // This prevents duplicate requests (both directions: A → B or B → A)
+    //if you put compound index on the both items this query will be fast
     const existingConnectionRequest = await ConnectionRequest.findOne({
       $or: [
         // Case 1: Request already sent from current user to target user
@@ -56,7 +57,8 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res)
     const data = await connectionRequest.save()
 
     res.json({
-      message: "Connection request sent successfully",
+      message:
+          req.user.firstName + " is " + status + " in " + toUser.firstName,
       data,
     })
   } catch (err) {
