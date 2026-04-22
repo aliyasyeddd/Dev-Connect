@@ -596,3 +596,70 @@ connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
 -> suppose you want to find user by first name + last name i will create compound index on both fields
 -> { fromUserId: 1, toUserId: 1 } queries will be fast
 -> when you create a lot of indexes it will be tough for db to handle if there are 1lakh + users it makes sense to add these compound index
+
+
+
+
+->userAuth will check whether cookie has token and token is valid or not , and it will find information about the logged in user , it will get data of logged in user from database it will call the next function
+
+-> use cases for request/review/:status/:requestId
+-> validate the status
+-> 1. user1 - user2
+-> 2. loggedInId(user2) - toUserId
+-> 3. status = interested
+-> 4. request id should be valid
+
+
+
+
+-> .find method returns you an array of saved objects from database
+-> .findOne method returns you an one object
+
+
+
+-> whenever user sends connection request mongodb creates a reference between connectionRequest and user schema
+-> ref: "User" -> from user id to user which isin user schema
+-> fromUserId is reference to user collection
+ fromUserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // reference to the user collection
+        required: true,
+    },
+-> Link between two collections fetch and populate data
+-> also be careful while getting data from data base abd sending back to user
+
+
+
+-> user1 sent connection to user2 and user2 accepted the request
+-> user2 sent connection to user3 and user3 accepted the request
+-> either user2 can be sender or receiver of the connection request but the status should be accepted
+-> populate will replace the userId with the actual user data but only the
+-> fields which are mentioned in the second parameter of populate will be replaced
+        const connectionRequests = await ConnectionRequest.find({
+            $or: [
+                { toUserId: loggedInUser._id, status: "accepted" },
+                { fromUserId: loggedInUser._id, status: "accepted" },
+            ],
+        })
+            .populate("fromUserId", USER_SAFE_DATA)
+            .populate("toUserId", USER_SAFE_DATA);
+
+
+
+
+
+-> sending only the user data of the connected user not the whole connection request data
+        const data = connectionRequests.map((row) => {
+           -> if the loggedIn user is the sender of the connection request then we will send the receiver's data and 
+           -> if the loggedIn user is the receiver of the connection request then we will send the sender's data
+            -> if we don't check this it will send the loggedIn user's data in both cases which is not correct we need to send 
+            -> the other user's data
+            if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
+                return row.toUserId;
+            }
+            return row.fromUserId;
+        });
+        res.json({ data });
+
+
+

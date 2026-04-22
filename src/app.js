@@ -11,11 +11,13 @@ app.use(cookieParser()); //middleware to parse the cookies and attach it to the 
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
+const userRouter = require("./routes/user");
 
 //whenever request coming from slash go to authRouter and check if there is any matching route in authRouter
 app.use("/", authRouter)
 app.use("/", profileRouter)
 app.use("/", requestRouter)
+app.use("/", userRouter)
 
 //returns a promise
 connectDB().then(() => {
