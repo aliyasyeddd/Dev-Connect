@@ -3,6 +3,7 @@ const userRouter = express.Router()
 
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 
 const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 
@@ -47,7 +48,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
         })
             .populate("fromUserId", USER_SAFE_DATA)
             .populate("toUserId", USER_SAFE_DATA);
-            
+
         // sending only the user data of the connected user not the whole connection request data
         const data = connectionRequests.map((row) => {
             //if the loggedIn user is the sender of the connection request then we will send the receiver's data and 
@@ -67,6 +68,57 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     }
 })
 
+//user should see all the cards except
+//0. his own card
+//1. the cards of the users to whom he has sent connection request already(pending or accepted)
+//2. ignored people's cards
+//3. his connections cards
+userRouter.get("/feed", userAuth, async (req, res) => {
+    try {
+
+        const loggedInUser = req.user;
+
+        //pagination parameters 
+        const page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 10;
+        limit = limit > 50 ? 50 : limit;
+        const skip = (page - 1) * limit;
+
+        //Find all connection requests either i have (sent + received) 
+        const connectionRequests = await ConnectionRequest.find({
+            $or: [
+                { fromUserId: loggedInUser._id },
+                { toUserId: loggedInUser._id }
+            ]
+        }).select("fromUserId toUserId");
+
+
+        const hideUsersFromFeed = new Set();
+        connectionRequests.forEach((request) => {
+            //if the loggedIn user is the sender of the connection request then we will hide the receiver's card from the feed and
+            hideUsersFromFeed.add(request.fromUserId.toString());
+            //if the loggedIn user is the receiver of the connection request then we will hide the sender's card from the feed
+            hideUsersFromFeed.add(request.toUserId.toString());
+        });
+
+        const users = await User.find({
+            $and: [
+                //hide the users whose cards i have sent or received connection request to/from
+                //nin means not in and it will check if the _id of the user is not in the hideUsersFromFeed set then only it will be included in the result
+                { _id: { $nin: Array.from(hideUsersFromFeed) } },
+                //hide my own card from the feed
+                //ne means not equal and it will check if the _id of the user is not equal to the loggedIn user's _id then only it will be included in the result
+                { _id: { $ne: loggedInUser._id } },
+            ],
+        }).select(USER_SAFE_DATA)
+            .skip(skip)
+            .limit(limit);
+
+        res.json({ data: users });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+})
 
 
 module.exports = userRouter;

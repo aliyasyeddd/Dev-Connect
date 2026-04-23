@@ -663,3 +663,23 @@ connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
 
 
 
+        const hideUsersFromFeed = new Set();
+        connectionRequests.forEach((request) => {
+            -> if the loggedIn user is the sender of the connection request then we will hide the receiver's card from the feed and
+            hideUsersFromFeed.add(request.fromUserId.toString());
+            -> if the loggedIn user is the receiver of the connection request then we will hide the sender's card from the feed
+            hideUsersFromFeed.add(request.toUserId.toString());
+        });
+
+        const users = await User.find({
+            $and: [
+                -> hide the users whose cards i have sent or received connection request to/from
+                -> nin means not in and it will check if the _id of the user is not in the hideUsersFromFeed set then only it will be included in the result
+                { _id: { $nin: Array.from(hideUsersFromFeed) } },
+                -> hide my own card from the feed
+                -> ne means not equal and it will check if the _id of the user is not equal to the loggedIn user's _id then only it will be included in the result
+                { _id: { $ne: loggedInUser._id } },
+            ],
+        }).select(USER_SAFE_DATA)
+
+
