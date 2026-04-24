@@ -2,6 +2,18 @@ const express = require('express');
 const connectDB = require('./config/database');
 const app = express();
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
+
+
+//cors is a middleware which allows us to specify which frontend application can access our backend APIs and 
+//also allows us to specify whether the frontend application can send cookies or not
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    //when we set credentials to true it allows the frontend application to send cookies to the backend APIs
+    credentials: true,
+  })
+);
 
 
 app.use(express.json()); //middleware to parse the incoming request body as JSON
